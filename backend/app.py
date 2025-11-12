@@ -616,16 +616,26 @@ def get_yazim_sablonlari():
 @app.route('/api/ai/dilekce-yaz', methods=['POST'])
 def ai_dilekce_yaz():
     """AI ile dilekçe yazma - Sadece hukuk konularında"""
-    data = request.json
-    dilekce_turu = data.get('dilekce_turu', 'genel')
-    mahkeme = data.get('mahkeme', '')
-    davaci = data.get('davaci', '')
-    davali = data.get('davali', '')
-    konu = data.get('konu', '')
-    ek_bilgiler = data.get('ek_bilgiler', '')
-    
-    # Sistem prompt'u - Dilekçe yazma için (Geliştirilmiş)
-    system_prompt = """Sen Türk hukuk sistemi konusunda uzman bir hukuk asistanısın ve dilekçe yazma konusunda deneyimlisin.
+    try:
+        print('=== DİLEKÇE YAZMA İSTEĞİ ALINDI ===')
+        data = request.json
+        print(f'Request data: {data}')
+        
+        dilekce_turu = data.get('dilekce_turu', 'genel')
+        mahkeme = data.get('mahkeme', '')
+        davaci = data.get('davaci', '')
+        davali = data.get('davali', '')
+        konu = data.get('konu', '')
+        ek_bilgiler = data.get('ek_bilgiler', '')
+        
+        print(f'Dilekçe Türü: {dilekce_turu}')
+        print(f'Mahkeme: {mahkeme}')
+        print(f'Davacı: {davaci}')
+        print(f'Davalı: {davali}')
+        print(f'Konu: {konu}')
+        
+        # Sistem prompt'u - Dilekçe yazma için (Geliştirilmiş)
+        system_prompt = """Sen Türk hukuk sistemi konusunda uzman bir hukuk asistanısın ve dilekçe yazma konusunda deneyimlisin.
 Sadece hukuki dilekçeler yazarsın. Dilekçeler Türk hukuk sistemine uygun, profesyonel ve resmi dilde olmalıdır.
 
 Dilekçe formatı ve kuralları:
@@ -644,11 +654,11 @@ Dilekçe yazarken:
 - Yargıtay içtihatlarına atıf yap (mümkünse)
 - Dilekçe tam ve eksiksiz olmalı
 - Paragraflar düzenli ve okunabilir olmalı"""
-    
-    # Ek bilgiler varsa prompt'a ekle
-    ek_bilgi_metni = f"\n\nEk Bilgiler ve Detaylar:\n{ek_bilgiler}" if ek_bilgiler else ""
-    
-    user_prompt = f"""Aşağıdaki bilgilere göre profesyonel ve eksiksiz bir {dilekce_turu} dilekçesi yaz:
+        
+        # Ek bilgiler varsa prompt'a ekle
+        ek_bilgi_metni = f"\n\nEk Bilgiler ve Detaylar:\n{ek_bilgiler}" if ek_bilgiler else ""
+        
+        user_prompt = f"""Aşağıdaki bilgilere göre profesyonel ve eksiksiz bir {dilekce_turu} dilekçesi yaz:
 
 MAHKEME/KURUM:
 {mahkeme}
@@ -670,13 +680,15 @@ LÜTFEN:
 4. Resmi dilekçe formatına uygun yaz
 5. Tarih formatı: DD.MM.YYYY kullan
 6. Dilekçe tam ve eksiksiz olsun, sadece şablon değil gerçek bir dilekçe gibi yaz"""
-    
-    try:
+        
         import os
         openai_api_key = os.getenv('OPENAI_API_KEY', '')
         
+        print(f'OpenAI API Key var mı: {bool(openai_api_key)}')
+        
         if openai_api_key:
             try:
+                print('OpenAI API çağrısı yapılıyor...')
                 from openai import OpenAI
                 client = OpenAI(api_key=openai_api_key)
                 
@@ -691,10 +703,16 @@ LÜTFEN:
                 )
                 
                 dilekce_metni = response.choices[0].message.content
+                print(f'OpenAI başarılı! Dilekçe uzunluğu: {len(dilekce_metni)} karakter')
             except Exception as e:
+                print(f'OpenAI hatası: {str(e)}')
                 dilekce_metni = _get_fallback_dilekce(dilekce_turu, mahkeme, davaci, davali, konu)
+                print('Fallback dilekçe kullanıldı (OpenAI hatası)')
         else:
+            print('OpenAI API key yok, fallback dilekçe kullanılıyor')
             dilekce_metni = _get_fallback_dilekce(dilekce_turu, mahkeme, davaci, davali, konu)
+        
+        print(f'Dilekçe metni hazırlandı, uzunluk: {len(dilekce_metni)} karakter')
         
         return jsonify({
             'success': True,
@@ -703,6 +721,10 @@ LÜTFEN:
         })
     except Exception as e:
         # Hata durumunda fallback dilekçe döndür
+        print(f'Genel hata: {str(e)}')
+        import traceback
+        print(f'Traceback: {traceback.format_exc()}')
+        
         fallback_dilekce = _get_fallback_dilekce(dilekce_turu, mahkeme, davaci, davali, konu)
         return jsonify({
             'success': True,  # Fallback olsa bile success döndür (kullanıcı bir şey görsün)
@@ -836,6 +858,26 @@ def _get_fallback_response(message, asistan_turu):
         return f"Hukuk konusunda sorunuzu anladım. '{message}' hakkında size yardımcı olabilirim. Ancak daha detaylı yanıtlar için OpenAI API key'i backend/app.py dosyasına eklenmelidir. Şimdilik genel bilgiler verebilirim."
     else:
         return "Üzgünüm, ben sadece hukuk, mevzuat, içtihat, dilekçe ve sözleşme konularında yardımcı olabilirim. Lütfen hukuki bir soru sorun."
+
+# ==================== HEALTH CHECK / WAKE UP ====================
+
+@app.route('/api/health', methods=['GET'])
+def health_check():
+    """Backend sağlık kontrolü ve uyandırma endpoint'i"""
+    return jsonify({
+        'status': 'ok',
+        'message': 'Backend çalışıyor',
+        'timestamp': datetime.now().isoformat()
+    })
+
+@app.route('/api/wake', methods=['GET'])
+def wake_up():
+    """Backend'i uyandırmak için basit endpoint (Render uyku modundan çıkarmak için)"""
+    return jsonify({
+        'status': 'awake',
+        'message': 'Backend uyanık',
+        'timestamp': datetime.now().isoformat()
+    })
 
 if __name__ == '__main__':
     # Production'da gunicorn kullanılır, bu sadece development için
