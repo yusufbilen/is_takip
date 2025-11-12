@@ -15,7 +15,7 @@ class ApiService {
   // Railway (Ücretli): https://your-project.railway.app/api
   // Fly.io (ÜCRETSİZ): https://your-app.fly.dev/api
   // Heroku (Ücretli): https://your-app.herokuapp.com/api
-  static const String _productionUrl = 'https://your-project.onrender.com/api'; // TODO: Deploy sonrası güncelleyin
+  static const String _productionUrl = 'https://dava-takip-backend.onrender.com/api';
   
   // Development URL'leri
   static const String _androidEmulatorUrl = 'http://10.0.2.2:5000/api';
@@ -32,11 +32,17 @@ class ApiService {
     // Not: Platform kontrolü için kullanıcı manuel olarak değiştirmeli
     // Veya build-time'da environment variable ile belirlenebilir
     
-    // Şimdilik Android emülatör için varsayılan
+    // Production modunda production URL'i kullan
+    // Development için Android emülatör URL'i
     // Fiziksel cihaz kullanıyorsanız _physicalDeviceUrl'i kullanın
-    return _androidEmulatorUrl;
     
-    // Fiziksel cihaz için yukarıdaki satırı şununla değiştirin:
+    // Şimdilik production URL'i kullan (deploy edildi)
+    return _productionUrl;
+    
+    // Development için (local backend):
+    // return _androidEmulatorUrl;
+    
+    // Fiziksel cihaz için:
     // return _physicalDeviceUrl;
   }
 
