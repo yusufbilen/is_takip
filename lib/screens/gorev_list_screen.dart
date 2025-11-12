@@ -1,0 +1,316 @@
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../providers/app_provider.dart';
+import '../models/gorev.dart';
+import '../widgets/gorev_card.dart';
+import 'gorev_form_screen.dart';
+
+class GorevListScreen extends StatefulWidget {
+  const GorevListScreen({super.key});
+
+  @override
+  State<GorevListScreen> createState() => _GorevListScreenState();
+}
+
+class _GorevListScreenState extends State<GorevListScreen> {
+  final TextEditingController _searchController = TextEditingController();
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Color(0xFF0F172A), // Koyu Lacivert
+              Color(0xFF1E293B), // Koyu Mavi
+              Color(0xFF334155), // Orta Koyu
+              Color(0xFF0F172A), // Koyu Lacivert Background
+            ],
+            stops: [0.0, 0.3, 0.6, 0.6],
+          ),
+        ),
+        child: SafeArea(
+          child: Column(
+            children: [
+              _buildHeader(),
+              _buildSearchBar(),
+              Expanded(
+                child: _buildGorevList(),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHeader() {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      child: Row(
+        children: [
+          GestureDetector(
+            onTap: () => Navigator.pop(context),
+            child: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.2),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: const Icon(
+                Icons.arrow_back,
+                color: Colors.white,
+                size: 24,
+              ),
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Görevler',
+                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Consumer<AppProvider>(
+                  builder: (context, provider, child) {
+                    return Text(
+                      '${provider.gorevler.length} görev',
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: Colors.white.withOpacity(0.8),
+                      ),
+                    );
+                  },
+                ),
+              ],
+            ),
+          ),
+          GestureDetector(
+            onTap: _addGorev,
+            child: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.2),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: const Icon(
+                Icons.add,
+                color: Colors.white,
+                size: 24,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSearchBar() {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 20),
+      decoration: BoxDecoration(
+        color: const Color(0xFF0F172A), // Koyu lacivert arka plan
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.white.withOpacity(0.2)),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF1E3A8A).withOpacity(0.3),
+            blurRadius: 15,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: TextField(
+        controller: _searchController,
+        style: const TextStyle(color: Colors.white),
+        decoration: InputDecoration(
+          hintText: 'Görev ara...',
+          hintStyle: const TextStyle(color: Colors.white70),
+          prefixIcon: const Icon(Icons.search, color: Colors.white),
+          suffixIcon: _searchController.text.isNotEmpty
+              ? IconButton(
+                  icon: const Icon(Icons.clear, color: Colors.white),
+                  onPressed: () {
+                    _searchController.clear();
+                    setState(() {});
+                  },
+                )
+              : null,
+          border: InputBorder.none,
+          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        ),
+        onChanged: (value) {
+          setState(() {});
+        },
+      ),
+    );
+  }
+
+  Widget _buildGorevList() {
+    return Consumer<AppProvider>(
+      builder: (context, provider, child) {
+        if (provider.isLoading) {
+          return const Center(
+            child: CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF0F172A)),
+            ),
+          );
+        }
+
+        List<Gorev> filteredGorevler = provider.gorevler.where((gorev) {
+          final searchTerm = _searchController.text.toLowerCase();
+          return gorev.baslik.toLowerCase().contains(searchTerm) || (gorev.aciklama?.toLowerCase().contains(searchTerm) ?? false);
+        }).toList();
+
+        if (filteredGorevler.isEmpty) {
+          return _buildEmptyState();
+        }
+
+        return ListView.builder(
+          padding: const EdgeInsets.all(20),
+          itemCount: filteredGorevler.length,
+          itemBuilder: (context, index) {
+            final gorev = filteredGorevler[index];
+            return GorevCard(
+              gorev: gorev,
+              onTap: () => _editGorev(gorev),
+              onDelete: () => _deleteGorev(gorev),
+              onComplete: () => _completeGorev(gorev),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Widget _buildEmptyState() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            width: 120,
+            height: 120,
+            decoration: BoxDecoration(
+              color: const Color(0xFF0F172A).withOpacity(0.1),
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(
+              Icons.task_outlined,
+              size: 60,
+              color: Color(0xFF0F172A),
+            ),
+          ),
+          const SizedBox(height: 24),
+          Text(
+            'Henüz görev yok',
+            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+              fontWeight: FontWeight.w600,
+              color: Colors.white,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'İlk görevinizi oluşturarak başlayın',
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: Colors.white70,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 24),
+          ElevatedButton.icon(
+            onPressed: _addGorev,
+            icon: const Icon(Icons.add),
+            label: const Text('Görev Ekle'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.white.withOpacity(0.2),
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+                side: const BorderSide(color: Colors.white, width: 1),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _addGorev() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const GorevFormScreen(),
+      ),
+    );
+  }
+
+  void _editGorev(Gorev gorev) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => GorevFormScreen(gorev: gorev),
+      ),
+    );
+  }
+
+  void _completeGorev(Gorev gorev) {
+    final completedGorev = gorev.copyWith(
+      durum: GorevDurumu.tamamlandi,
+      tamamlanmaTarihi: DateTime.now(),
+      updatedAt: DateTime.now(),
+    );
+    
+    context.read<AppProvider>().updateGorev(completedGorev);
+    
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('${gorev.baslik} tamamlandı'),
+        backgroundColor: const Color(0xFF10B981),
+      ),
+    );
+  }
+
+  void _deleteGorev(Gorev gorev) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Görev Sil'),
+        content: Text('${gorev.baslik} görevini silmek istediğinizden emin misiniz?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('İptal'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              context.read<AppProvider>().deleteGorev(gorev.id!);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('${gorev.baslik} silindi'),
+                  backgroundColor: const Color(0xFF10B981),
+                ),
+              );
+            },
+            child: const Text('Sil', style: TextStyle(color: Color(0xFFEF4444))),
+          ),
+        ],
+      ),
+    );
+  }
+}
