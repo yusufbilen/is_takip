@@ -864,7 +864,7 @@ def _get_fallback_response(message, asistan_turu):
     if any(word in message_lower for word in ['merhaba', 'selam', 'hello']):
         return "Merhaba! Ben hukuk asistanınızım. Sadece hukuk, mevzuat, içtihat, dilekçe ve sözleşme konularında size yardımcı olabilirim. Nasıl yardımcı olabilirim?"
     elif any(word in message_lower for word in ['hukuk', 'kanun', 'mevzuat', 'dilekçe', 'sözleşme', 'karar', 'mahkeme', 'dava', 'yargıtay', 'danıştay']):
-        return f"Hukuk konusunda sorunuzu anladım. '{message}' hakkında size yardımcı olabilirim. Ancak daha detaylı yanıtlar için OpenAI API key'i backend/app.py dosyasına eklenmelidir. Şimdilik genel bilgiler verebilirim."
+        return f"Hukuk konusunda sorunuzu anladım. '{message}' hakkında size yardımcı olabilirim. Daha detaylı yanıtlar için OpenAI API key'i Render dashboard'da Environment Variables'a eklenmelidir. Şimdilik genel bilgiler verebilirim."
     else:
         return "Üzgünüm, ben sadece hukuk, mevzuat, içtihat, dilekçe ve sözleşme konularında yardımcı olabilirim. Lütfen hukuki bir soru sorun."
 
