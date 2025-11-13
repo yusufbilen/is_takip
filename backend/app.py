@@ -744,10 +744,14 @@ LÜTFEN:
                 print(f'OpenAI başarılı! Dilekçe uzunluğu: {len(dilekce_metni)} karakter')
             except Exception as e:
                 print(f'OpenAI hatası: {str(e)}')
-                dilekce_metni = _get_fallback_dilekce(dilekce_turu, mahkeme, davaci, davali, konu)
-                print('Fallback dilekçe kullanıldı (OpenAI hatası)')
-        else:
-            print('OpenAI API key yok, fallback dilekçe kullanılıyor')
+                dilekce_metni = None
+        
+        # Her iki API de başarısız olduysa fallback
+        if not dilekce_metni:
+            if not gemini_api_key and not openai_api_key:
+                print('Hiçbir API key yok, fallback dilekçe kullanılıyor')
+            else:
+                print('Tüm API\'ler başarısız, fallback dilekçe kullanılıyor')
             dilekce_metni = _get_fallback_dilekce(dilekce_turu, mahkeme, davaci, davali, konu)
         
         print(f'Dilekçe metni hazırlandı, uzunluk: {len(dilekce_metni)} karakter')
