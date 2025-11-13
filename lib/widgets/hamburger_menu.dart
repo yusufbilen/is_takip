@@ -55,484 +55,201 @@ class HamburgerMenu extends StatelessWidget {
           ),
           
           // Dilekçe Bölümü
-          _buildSectionTitle('Dilekçe'),
-          _buildMenuItem(
+          _buildExpansionTile(
             context,
-            icon: Icons.description,
-            title: 'Dilekçe Oluştur',
-            subtitle: 'Hukuki dilekçe hazırlama',
-            screen: const DilekceOlusturScreen(),
+            title: 'Dilekçe',
+            children: [
+              _buildSubItem(context, 'Dilekçe Oluştur', const DilekceOlusturScreen()),
+              _buildSubItem(context, 'Dilekçe Şablonları', const DilekceSablonlariScreen()),
+              _buildSubItem(context, 'Dilekçe Geçmişi', const DilekceSablonlariScreen()),
+            ],
           ),
-          _buildMenuItem(
-            context,
-            icon: Icons.folder_open,
-            title: 'Dilekçe Şablonları',
-            subtitle: 'Hazır dilekçe şablonları',
-            screen: const DilekceSablonlariScreen(),
-          ),
-          _buildMenuItem(
-            context,
-            icon: Icons.history,
-            title: 'Dilekçe Geçmişi',
-            subtitle: 'Oluşturduğunuz dilekçeler',
-            screen: const DilekceSablonlariScreen(), // Geçici olarak aynı ekran
-          ),
-          
-          const Divider(color: Colors.white24),
           
           // Sözleşme Bölümü
-          _buildSectionTitle('Sözleşme'),
-          _buildMenuItem(
+          _buildExpansionTile(
             context,
-            icon: Icons.description,
-            title: 'Sözleşme Oluştur',
-            subtitle: 'Hukuki sözleşme hazırlama',
-            screen: const SozlesmeOlusturScreen(),
+            title: 'Sözleşme',
+            children: [
+              _buildSubItem(context, 'Sözleşme Oluştur', const SozlesmeOlusturScreen()),
+              _buildSubItem(context, 'Sözleşme Şablonları', const SozlesmeOlusturScreen()),
+              _buildSubItem(context, 'Sözleşme Türleri', const SozlesmeOlusturScreen()),
+            ],
           ),
-          _buildMenuItem(
-            context,
-            icon: Icons.folder_special,
-            title: 'Sözleşme Şablonları',
-            subtitle: 'Hazır sözleşme şablonları',
-            screen: const SozlesmeOlusturScreen(), // Geçici
-          ),
-          _buildMenuItem(
-            context,
-            icon: Icons.category,
-            title: 'Sözleşme Türleri',
-            subtitle: 'Kira, satış, hizmet vb.',
-            screen: const SozlesmeOlusturScreen(), // Geçici
-          ),
-          
-          const Divider(color: Colors.white24),
           
           // Hesaplama Bölümü
-          _buildSectionTitle('Hesaplama'),
-          _buildMenuItem(
+          _buildExpansionTile(
             context,
-            icon: Icons.calculate,
-            title: 'Faiz Hesaplama',
-            subtitle: 'Yasal faiz hesaplama',
-            url: 'https://mevzuat.sinerjias.com.tr/hukuk-asistani/hesaplama/faiz',
+            title: 'Hesaplama',
+            children: [
+              _buildSubItemWithUrl(context, 'Faiz Hesaplama', 'faiz'),
+              _buildSubItemWithUrl(context, 'Tazminat Hesaplama', 'tazminat'),
+              _buildSubItemWithUrl(context, 'Nafaka Hesaplama', 'nafaka'),
+              _buildSubItemWithUrl(context, 'Süre Hesaplama', 'sure'),
+              _buildSubItemWithUrl(context, 'İnfaz Süresi Hesaplama', 'infaz-suresi'),
+              _buildSubItemWithUrl(context, 'Miras Saklı Pay Hesaplama', 'miras-sakli-pay'),
+              _buildSubItemWithUrl(context, 'Yerel Mahkeme - Hukuk Harç Hesaplama', 'yerel-mahkeme-harc'),
+              _buildSubItemWithUrl(context, 'Bölge Adliye Mahkemesi - Hukuk Harç Hesaplama', 'bolge-adliye-harc'),
+              _buildSubItemWithUrl(context, 'Yargıtay - Hukuk Harç Hesaplama', 'yargitay-harc'),
+              _buildSubItemWithUrl(context, 'İdare Mahkemesi - Harç Hesaplama', 'idare-mahkemesi-harc'),
+              _buildSubItemWithUrl(context, 'Bölge İdare Mahkemesi - Harç Hesaplama', 'bolge-idare-harc'),
+              _buildSubItemWithUrl(context, 'Vergi Mahkemesi - Harç Hesaplama', 'vergi-mahkemesi-harc'),
+              _buildSubItemWithUrl(context, 'Danıştay Dairesi - Harç Hesaplama', 'danistay-harc'),
+              _buildSubItemWithUrl(context, 'Vekalet Ücreti Hesaplama', 'vekalet-ucreti'),
+              _buildSubItemWithUrl(context, 'Arabuluculuk Tarifesi', 'arabuluculuk-tarifesi'),
+              _buildSubItemWithUrl(context, 'Makbuz Hesaplama', 'makbuz'),
+            ],
           ),
-          _buildMenuItem(
-            context,
-            icon: Icons.trending_up,
-            title: 'Tazminat Hesaplama',
-            subtitle: 'Maddi ve manevi tazminat',
-            url: 'https://mevzuat.sinerjias.com.tr/hukuk-asistani/hesaplama/tazminat',
-          ),
-          _buildMenuItem(
-            context,
-            icon: Icons.account_balance_wallet,
-            title: 'Nafaka Hesaplama',
-            subtitle: 'Nafaka miktarı hesaplama',
-            url: 'https://mevzuat.sinerjias.com.tr/hukuk-asistani/hesaplama/nafaka',
-          ),
-          _buildMenuItem(
-            context,
-            icon: Icons.calendar_today,
-            title: 'Süre Hesaplama',
-            subtitle: 'Yasal süre hesaplama',
-            url: 'https://mevzuat.sinerjias.com.tr/hukuk-asistani/hesaplama/sure',
-          ),
-          _buildMenuItem(
-            context,
-            icon: Icons.timer,
-            title: 'İnfaz Süresi Hesaplama',
-            subtitle: 'İnfaz süresi hesaplama',
-            url: 'https://mevzuat.sinerjias.com.tr/hesaplama/infaz-suresi',
-          ),
-          _buildMenuItem(
-            context,
-            icon: Icons.account_balance,
-            title: 'Miras Saklı Pay Hesaplama',
-            subtitle: 'Miras saklı pay hesaplama',
-            url: 'https://mevzuat.sinerjias.com.tr/hesaplama/miras-sakli-pay',
-          ),
-          _buildMenuItem(
-            context,
-            icon: Icons.gavel,
-            title: 'Yerel Mahkeme - Hukuk Harç Hesaplama',
-            subtitle: 'Yerel mahkeme harç hesaplama',
-            url: 'https://mevzuat.sinerjias.com.tr/hesaplama/yerel-mahkeme-harc',
-          ),
-          _buildMenuItem(
-            context,
-            icon: Icons.balance,
-            title: 'Bölge Adliye Mahkemesi - Hukuk Harç Hesaplama',
-            subtitle: 'İstinaf harç hesaplama',
-            url: 'https://mevzuat.sinerjias.com.tr/hesaplama/bolge-adliye-harc',
-          ),
-          _buildMenuItem(
-            context,
-            icon: Icons.scale,
-            title: 'Yargıtay - Hukuk Harç Hesaplama',
-            subtitle: 'Yargıtay harç hesaplama',
-            url: 'https://mevzuat.sinerjias.com.tr/hesaplama/yargitay-harc',
-          ),
-          _buildMenuItem(
-            context,
-            icon: Icons.business,
-            title: 'İdare Mahkemesi - Harç Hesaplama',
-            subtitle: 'İdare mahkemesi harç hesaplama',
-            url: 'https://mevzuat.sinerjias.com.tr/hesaplama/idare-mahkemesi-harc',
-          ),
-          _buildMenuItem(
-            context,
-            icon: Icons.business,
-            title: 'Bölge İdare Mahkemesi - Harç Hesaplama',
-            subtitle: 'Bölge idare mahkemesi harç hesaplama',
-            url: 'https://mevzuat.sinerjias.com.tr/hesaplama/bolge-idare-harc',
-          ),
-          _buildMenuItem(
-            context,
-            icon: Icons.receipt,
-            title: 'Vergi Mahkemesi - Harç Hesaplama',
-            subtitle: 'Vergi mahkemesi harç hesaplama',
-            url: 'https://mevzuat.sinerjias.com.tr/hesaplama/vergi-mahkemesi-harc',
-          ),
-          _buildMenuItem(
-            context,
-            icon: Icons.account_balance,
-            title: 'Danıştay Dairesi - Harç Hesaplama',
-            subtitle: 'Danıştay harç hesaplama',
-            url: 'https://mevzuat.sinerjias.com.tr/hesaplama/danistay-harc',
-          ),
-          _buildMenuItem(
-            context,
-            icon: Icons.attach_money,
-            title: 'Vekalet Ücreti Hesaplama',
-            subtitle: 'Vekalet ücreti hesaplama',
-            url: 'https://mevzuat.sinerjias.com.tr/hesaplama/vekalet-ucreti',
-          ),
-          _buildMenuItem(
-            context,
-            icon: Icons.handshake,
-            title: 'Arabuluculuk Tarifesi',
-            subtitle: 'Arabuluculuk ücret tarifesi',
-            url: 'https://mevzuat.sinerjias.com.tr/hesaplama/arabuluculuk-tarifesi',
-          ),
-          _buildMenuItem(
-            context,
-            icon: Icons.receipt_long,
-            title: 'Makbuz Hesaplama',
-            subtitle: 'Makbuz hesaplama',
-            url: 'https://mevzuat.sinerjias.com.tr/hesaplama/makbuz',
-          ),
-          
-          const Divider(color: Colors.white24),
           
           // Mevzuat Bölümü
-          _buildSectionTitle('Mevzuat'),
-          _buildMenuItem(
+          _buildExpansionTile(
             context,
-            icon: Icons.book,
-            title: 'Kanun',
-            subtitle: 'Türk hukuk kanunları',
-            screen: MevzuatAramaScreen(title: 'Kanun', mevzuatTuru: 'Kanun'),
+            title: 'Mevzuat',
+            children: [
+              _buildSubItem(context, 'Kanun', MevzuatAramaScreen(title: 'Kanun', mevzuatTuru: 'Kanun')),
+              _buildSubItem(context, 'Cumhurbaşkanlığı Kararnamesi', MevzuatAramaScreen(title: 'Cumhurbaşkanlığı Kararnamesi', mevzuatTuru: 'Cumhurbaşkanlığı Kararnamesi')),
+              _buildSubItem(context, 'Kanun Hükmünde Kararname', MevzuatAramaScreen(title: 'Kanun Hükmünde Kararname', mevzuatTuru: 'KHK')),
+              _buildSubItem(context, 'Yönetmelik', MevzuatAramaScreen(title: 'Yönetmelik', mevzuatTuru: 'Yönetmelik')),
+              _buildSubItem(context, 'Cumhurbaşkanlığı Kararı', MevzuatAramaScreen(title: 'Cumhurbaşkanlığı Kararı', mevzuatTuru: 'Cumhurbaşkanlığı Kararı')),
+              _buildSubItem(context, 'Uluslararası Anlaşmalar ve Sözleşmeler', MevzuatAramaScreen(title: 'Uluslararası Anlaşmalar', mevzuatTuru: 'Uluslararası Anlaşma')),
+              _buildSubItem(context, 'Bakanlar Kurulu Kararı', MevzuatAramaScreen(title: 'Bakanlar Kurulu Kararı', mevzuatTuru: 'Bakanlar Kurulu Kararı')),
+              _buildSubItem(context, 'Mevzuat Arama', MevzuatAramaScreen(title: 'Mevzuat Arama', mevzuatTuru: 'Tümü')),
+            ],
           ),
-          _buildMenuItem(
-            context,
-            icon: Icons.description,
-            title: 'Cumhurbaşkanlığı Kararnamesi',
-            subtitle: 'Cumhurbaşkanlığı kararnameleri',
-            screen: MevzuatAramaScreen(title: 'Cumhurbaşkanlığı Kararnamesi', mevzuatTuru: 'Cumhurbaşkanlığı Kararnamesi'),
-          ),
-          _buildMenuItem(
-            context,
-            icon: Icons.article,
-            title: 'Kanun Hükmünde Kararname',
-            subtitle: 'KHK mevzuatı',
-            screen: MevzuatAramaScreen(title: 'Kanun Hükmünde Kararname', mevzuatTuru: 'KHK'),
-          ),
-          _buildMenuItem(
-            context,
-            icon: Icons.gavel,
-            title: 'Yönetmelik',
-            subtitle: 'Yönetmelik ve tüzükler',
-            screen: MevzuatAramaScreen(title: 'Yönetmelik', mevzuatTuru: 'Yönetmelik'),
-          ),
-          _buildMenuItem(
-            context,
-            icon: Icons.verified,
-            title: 'Cumhurbaşkanlığı Kararı',
-            subtitle: 'Cumhurbaşkanlığı kararları',
-            screen: MevzuatAramaScreen(title: 'Cumhurbaşkanlığı Kararı', mevzuatTuru: 'Cumhurbaşkanlığı Kararı'),
-          ),
-          _buildMenuItem(
-            context,
-            icon: Icons.public,
-            title: 'Uluslararası Anlaşmalar ve Sözleşmeler',
-            subtitle: 'Uluslararası anlaşmalar',
-            screen: MevzuatAramaScreen(title: 'Uluslararası Anlaşmalar', mevzuatTuru: 'Uluslararası Anlaşma'),
-          ),
-          _buildMenuItem(
-            context,
-            icon: Icons.group,
-            title: 'Bakanlar Kurulu Kararı',
-            subtitle: 'Bakanlar kurulu kararları',
-            screen: MevzuatAramaScreen(title: 'Bakanlar Kurulu Kararı', mevzuatTuru: 'Bakanlar Kurulu Kararı'),
-          ),
-          _buildMenuItem(
-            context,
-            icon: Icons.search,
-            title: 'Mevzuat Arama',
-            subtitle: 'Mevzuat içinde arama',
-            screen: MevzuatAramaScreen(title: 'Mevzuat Arama', mevzuatTuru: 'Tümü'),
-          ),
-          
-          const Divider(color: Colors.white24),
           
           // İçtihat Bölümü
-          _buildSectionTitle('İçtihat'),
-          _buildMenuItem(
+          _buildExpansionTile(
             context,
-            icon: Icons.gavel,
-            title: 'Yüksek Mahkeme Kararları',
-            subtitle: 'Yargıtay ve Danıştay kararları',
-            screen: IctihatAramaScreen(title: 'Yüksek Mahkeme Kararları'),
+            title: 'İçtihat',
+            children: [
+              _buildSubItem(context, 'Yüksek Mahkeme Kararları', IctihatAramaScreen(title: 'Yüksek Mahkeme Kararları')),
+              _buildSubItem(context, 'İstinaf Kararları', IctihatAramaScreen(title: 'İstinaf Kararları')),
+              _buildSubItem(context, 'Yürütmeyi Durdurma Kararları', IctihatAramaScreen(title: 'Yürütmeyi Durdurma Kararları')),
+              _buildSubItem(context, 'Kurum Kararları', IctihatAramaScreen(title: 'Kurum Kararları')),
+            ],
           ),
-          _buildMenuItem(
-            context,
-            icon: Icons.balance,
-            title: 'İstinaf Kararları',
-            subtitle: 'Bölge adliye mahkemesi kararları',
-            screen: IctihatAramaScreen(title: 'İstinaf Kararları'),
-          ),
-          _buildMenuItem(
-            context,
-            icon: Icons.pause_circle,
-            title: 'Yürütmeyi Durdurma Kararları',
-            subtitle: 'Yürütmeyi durdurma kararları',
-            screen: IctihatAramaScreen(title: 'Yürütmeyi Durdurma Kararları'),
-          ),
-          _buildMenuItem(
-            context,
-            icon: Icons.business,
-            title: 'Kurum Kararları',
-            subtitle: 'Kurum ve kuruluş kararları',
-            screen: IctihatAramaScreen(title: 'Kurum Kararları'),
-          ),
-          
-          const Divider(color: Colors.white24),
           
           // Yazım Bölümü
-          _buildSectionTitle('Yazım'),
-          _buildMenuItem(
+          _buildExpansionTile(
             context,
-            icon: Icons.edit,
-            title: 'Yazım Araçları',
-            subtitle: 'Hukuki yazım araçları',
-            screen: const YazimScreen(),
+            title: 'Yazım',
+            children: [
+              _buildSubItem(context, 'Yazım Araçları', const YazimScreen()),
+            ],
           ),
-          
-          const Divider(color: Colors.white24),
           
           // Pratik Bilgiler Bölümü
-          _buildSectionTitle('Pratik Bilgiler'),
-          _buildMenuItem(
+          _buildExpansionTile(
             context,
-            icon: Icons.info,
-            title: 'Genel Bilgiler',
-            subtitle: 'Genel hukuk bilgileri',
-            screen: PratikBilgilerScreen(title: 'Genel Bilgiler'),
+            title: 'Pratik Bilgiler',
+            children: [
+              _buildSubItem(context, 'Genel Bilgiler', PratikBilgilerScreen(title: 'Genel Bilgiler')),
+              _buildSubItem(context, 'Avukatlık Kuralları', PratikBilgilerScreen(title: 'Avukatlık Kuralları')),
+              _buildSubItem(context, 'Avukatlık Ücret Tarifesi', PratikBilgilerScreen(title: 'Avukatlık Ücret Tarifesi')),
+              _buildSubItem(context, 'Döviz Kurları', PratikBilgilerScreen(title: 'Döviz Kurları')),
+              _buildSubItem(context, 'Döviz Dönüştürücü', PratikBilgilerScreen(title: 'Döviz Dönüştürücü')),
+              _buildSubItem(context, 'Sözlük', PratikBilgilerScreen(title: 'Sözlük')),
+            ],
           ),
-          _buildMenuItem(
-            context,
-            icon: Icons.rule,
-            title: 'Avukatlık Kuralları',
-            subtitle: 'Avukatlık meslek kuralları',
-            screen: PratikBilgilerScreen(title: 'Avukatlık Kuralları'),
-          ),
-          _buildMenuItem(
-            context,
-            icon: Icons.attach_money,
-            title: 'Avukatlık Ücret Tarifesi',
-            subtitle: 'Avukatlık ücret tarifesi',
-            screen: PratikBilgilerScreen(title: 'Avukatlık Ücret Tarifesi'),
-          ),
-          _buildMenuItem(
-            context,
-            icon: Icons.trending_up,
-            title: 'Döviz Kurları',
-            subtitle: 'Güncel döviz kurları',
-            screen: PratikBilgilerScreen(title: 'Döviz Kurları'),
-          ),
-          _buildMenuItem(
-            context,
-            icon: Icons.swap_horiz,
-            title: 'Döviz Dönüştürücü',
-            subtitle: 'Döviz dönüştürme aracı',
-            screen: PratikBilgilerScreen(title: 'Döviz Dönüştürücü'),
-          ),
-          _buildMenuItem(
-            context,
-            icon: Icons.book,
-            title: 'Sözlük',
-            subtitle: 'Hukuk terimleri sözlüğü',
-            screen: PratikBilgilerScreen(title: 'Sözlük'),
-          ),
-          
-          const Divider(color: Colors.white24),
           
           // Hukuk Asistanı Bölümü
-          _buildSectionTitle('Hukuk Asistanı'),
-          _buildMenuItem(
+          _buildExpansionTile(
             context,
-            icon: Icons.gavel,
-            title: 'İçtihat Asistanı',
-            subtitle: 'İçtihat araştırma asistanı',
-            screen: HukukAsistaniAIScreen(title: 'İçtihat Asistanı', asistanTuru: 'ictihat'),
+            title: 'Hukuk Asistanı',
+            children: [
+              _buildSubItem(context, 'İçtihat Asistanı', HukukAsistaniAIScreen(title: 'İçtihat Asistanı', asistanTuru: 'ictihat')),
+              _buildSubItem(context, 'Mevzuat Asistanı', HukukAsistaniAIScreen(title: 'Mevzuat Asistanı', asistanTuru: 'mevzuat')),
+              _buildSubItem(context, 'Dilekçe Asistanı', HukukAsistaniAIScreen(title: 'Dilekçe Asistanı', asistanTuru: 'dilekce')),
+              _buildSubItem(context, 'Sözleşme Asistanı', HukukAsistaniAIScreen(title: 'Sözleşme Asistanı', asistanTuru: 'sozlesme')),
+            ],
           ),
-          _buildMenuItem(
-            context,
-            icon: Icons.book,
-            title: 'Mevzuat Asistanı',
-            subtitle: 'Mevzuat araştırma asistanı',
-            screen: HukukAsistaniAIScreen(title: 'Mevzuat Asistanı', asistanTuru: 'mevzuat'),
-          ),
-          _buildMenuItem(
-            context,
-            icon: Icons.edit,
-            title: 'Dilekçe Asistanı',
-            subtitle: 'Dilekçe hazırlama asistanı',
-            screen: HukukAsistaniAIScreen(title: 'Dilekçe Asistanı', asistanTuru: 'dilekce'),
-          ),
-          _buildMenuItem(
-            context,
-            icon: Icons.description,
-            title: 'Sözleşme Asistanı',
-            subtitle: 'Sözleşme hazırlama asistanı',
-            screen: HukukAsistaniAIScreen(title: 'Sözleşme Asistanı', asistanTuru: 'sozlesme'),
-          ),
-          
-          const Divider(color: Colors.white24),
           
           // Diğer Araçlar
-          _buildSectionTitle('Diğer Araçlar'),
-          _buildMenuItem(
+          _buildExpansionTile(
             context,
-            icon: Icons.calendar_month,
-            title: 'Dava Takvimi',
-            subtitle: 'Dava süreleri ve takvim',
-            url: 'https://mevzuat.sinerjias.com.tr/hukuk-asistani/takvim',
-          ),
-          _buildMenuItem(
-            context,
-            icon: Icons.article,
-            title: 'Makaleler',
-            subtitle: 'Hukuk makaleleri',
-            url: 'https://mevzuat.sinerjias.com.tr/makaleler',
-          ),
-          _buildMenuItem(
-            context,
-            icon: Icons.help_outline,
-            title: 'Yardım',
-            subtitle: 'Kullanım kılavuzu',
-            url: 'https://mevzuat.sinerjias.com.tr/yardim',
+            title: 'Diğer Araçlar',
+            children: [
+              _buildSubItemWithUrl(context, 'Dava Takvimi', 'takvim'),
+              _buildSubItemWithUrl(context, 'Makaleler', 'makaleler'),
+              _buildSubItemWithUrl(context, 'Yardım', 'yardim'),
+            ],
           ),
         ],
       ),
     );
   }
 
-  Widget _buildSectionTitle(String title) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-      child: Text(
-        title,
-        style: TextStyle(
-          color: Colors.white.withOpacity(0.7),
-          fontSize: 12,
-          fontWeight: FontWeight.w600,
-          letterSpacing: 1.2,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildMenuItem(
+  Widget _buildExpansionTile(
     BuildContext context, {
-    required IconData icon,
     required String title,
-    required String subtitle,
-    String? url,
-    Widget? screen,
+    required List<Widget> children,
   }) {
-    return ListTile(
-      leading: Icon(icon, color: Colors.white70),
+    return ExpansionTile(
       title: Text(
         title,
         style: const TextStyle(
           color: Colors.white,
           fontSize: 16,
-          fontWeight: FontWeight.w500,
+          fontWeight: FontWeight.w600,
         ),
       ),
-      subtitle: Text(
-        subtitle,
-        style: TextStyle(
-          color: Colors.white.withOpacity(0.6),
-          fontSize: 12,
-        ),
-      ),
-      trailing: Icon(
-        Icons.chevron_right,
-        color: Colors.white.withOpacity(0.5),
-      ),
+      iconColor: Colors.white70,
+      collapsedIconColor: Colors.white54,
+      backgroundColor: Colors.transparent,
+      collapsedBackgroundColor: Colors.transparent,
+      childrenPadding: const EdgeInsets.only(left: 24, right: 16, bottom: 4),
+      tilePadding: const EdgeInsets.symmetric(horizontal: 16),
+      children: children,
+    );
+  }
+
+  Widget _buildSubItem(BuildContext context, String title, Widget screen) {
+    return InkWell(
       onTap: () {
         Navigator.pop(context);
-        if (screen != null) {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => screen),
-          );
-        } else if (url != null) {
-          // Hesaplama ekranları için
-          if (title.contains('Hesaplama')) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => HesaplamaScreen(
-                  hesaplamaTuru: title.toLowerCase(),
-                  title: title,
-                ),
-              ),
-            );
-          } else if (title.contains('Mevzuat') || title.contains('Kanun') || title.contains('Yönetmelik')) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => MevzuatAramaScreen(
-                  title: title,
-                  mevzuatTuru: title,
-                ),
-              ),
-            );
-          } else if (title.contains('İçtihat') || title.contains('Karar')) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => IctihatAramaScreen(
-                  title: title,
-                ),
-              ),
-            );
-          } else if (title.contains('Pratik Bilgiler') || title.contains('Genel Bilgiler') || 
-                     title.contains('Avukatlık') || title.contains('Döviz') || title.contains('Sözlük')) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => PratikBilgilerScreen(
-                  title: title,
-                ),
-              ),
-            );
-          }
-        }
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => screen),
+        );
       },
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 0),
+        child: Text(
+          title,
+          style: TextStyle(
+            color: Colors.white.withOpacity(0.85),
+            fontSize: 14,
+            fontWeight: FontWeight.normal,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSubItemWithUrl(BuildContext context, String title, String hesaplamaTuru) {
+    return InkWell(
+      onTap: () {
+        Navigator.pop(context);
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => HesaplamaScreen(
+              hesaplamaTuru: hesaplamaTuru,
+              title: title,
+            ),
+          ),
+        );
+      },
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 0),
+        child: Text(
+          title,
+          style: TextStyle(
+            color: Colors.white.withOpacity(0.85),
+            fontSize: 14,
+            fontWeight: FontWeight.normal,
+          ),
+        ),
+      ),
     );
   }
 }
-

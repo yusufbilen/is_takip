@@ -125,10 +125,25 @@ class _HesaplamaScreenState extends State<HesaplamaScreen> {
           _isLoading = false;
         });
         if (mounted) {
+          String errorMessage = 'Hesaplama hatası oluştu.';
+          
+          if (e.toString().contains('uyku modunda') || 
+              e.toString().contains('502') || 
+              e.toString().contains('503')) {
+            errorMessage = 'Backend sunucusu uyku modunda. Lütfen 30-60 saniye bekleyip tekrar deneyin.';
+          } else if (e.toString().contains('timeout') || 
+                     e.toString().contains('TimeoutException')) {
+            errorMessage = 'İstek zaman aşımına uğradı. Render sunucusu uyku modunda olabilir. Lütfen tekrar deneyin.';
+          } else if (e.toString().contains('Failed host lookup') || 
+                     e.toString().contains('Connection refused')) {
+            errorMessage = 'Backend sunucusuna bağlanılamıyor. İnternet bağlantınızı kontrol edin.';
+          }
+          
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Hesaplama hatası: $e'),
+              content: Text(errorMessage),
               backgroundColor: Colors.red,
+              duration: const Duration(seconds: 5),
             ),
           );
         }

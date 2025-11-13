@@ -59,6 +59,10 @@ class _DilekceOlusturScreenState extends State<DilekceOlusturScreen> {
 
       try {
         // AI ile dilekçe yaz
+        print('Dilekçe oluşturma başlatılıyor...');
+        print('Dilekçe Türü: $_selectedDilekceTuru');
+        print('Mahkeme: ${_selectedMahkemeTuru} - ${_mahkemeController.text}');
+        
         final result = await ApiService.aiDilekceYaz(
           dilekceTuru: _selectedDilekceTuru,
           mahkeme: '${_selectedMahkemeTuru}\n${_mahkemeController.text}',
@@ -68,13 +72,28 @@ class _DilekceOlusturScreenState extends State<DilekceOlusturScreen> {
           ekBilgiler: _icerikController.text,
         );
 
+        print('API yanıtı alındı: ${result.toString()}');
+        
         if (result['success'] == true) {
           final dilekce = result['dilekce_metni'] ?? _buildDilekce();
+          
+          print('Dilekçe metni uzunluğu: ${dilekce.length}');
           
           if (mounted) {
             setState(() {
               _isLoading = false;
             });
+            
+            // Uyarı varsa göster
+            if (result['warning'] != null) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(result['warning']),
+                  backgroundColor: Colors.orange,
+                  duration: const Duration(seconds: 3),
+                ),
+              );
+            }
             
             // Sonuç ekranına git
             Navigator.push(
@@ -85,9 +104,11 @@ class _DilekceOlusturScreenState extends State<DilekceOlusturScreen> {
             );
           }
         } else {
-          throw Exception('Dilekçe oluşturulamadı');
+          print('API başarısız: ${result.toString()}');
+          throw Exception('Dilekçe oluşturulamadı: ${result['error'] ?? 'Bilinmeyen hata'}');
         }
       } catch (e) {
+        print('Dilekçe oluşturma hatası: $e');
         if (mounted) {
           setState(() {
             _isLoading = false;
@@ -102,10 +123,28 @@ class _DilekceOlusturScreenState extends State<DilekceOlusturScreen> {
             ),
           );
           
+          String errorMessage = 'AI ile oluşturulamadı, manuel dilekçe hazırlandı.';
+          
+          if (e.toString().contains('uyku modunda') || 
+              e.toString().contains('502') || 
+              e.toString().contains('503')) {
+            errorMessage = 'Backend sunucusu uyku modunda. Manuel dilekçe hazırlandı. 30-60 saniye sonra tekrar deneyebilirsiniz.';
+          } else if (e.toString().contains('timeout') || 
+                     e.toString().contains('TimeoutException')) {
+            errorMessage = 'İstek zaman aşımına uğradı. Manuel dilekçe hazırlandı.';
+          } else if (e.toString().contains('Failed host lookup') || 
+                     e.toString().contains('Connection refused') ||
+                     e.toString().contains('SocketException')) {
+            errorMessage = 'Backend sunucusuna bağlanılamıyor. Manuel dilekçe hazırlandı. İnternet bağlantınızı kontrol edin.';
+          } else {
+            errorMessage = 'Hata: ${e.toString().length > 80 ? e.toString().substring(0, 80) + "..." : e.toString()}\nManuel dilekçe hazırlandı.';
+          }
+          
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('AI ile oluşturulamadı, manuel dilekçe hazırlandı: $e'),
+              content: Text(errorMessage),
               backgroundColor: Colors.orange,
+              duration: const Duration(seconds: 6),
             ),
           );
         }

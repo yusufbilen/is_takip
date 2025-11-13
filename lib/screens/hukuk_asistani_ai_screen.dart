@@ -95,12 +95,18 @@ class _HukukAsistaniAIScreenState extends State<HukukAsistaniAIScreen> {
         String errorMessage = 'Bağlantı hatası oluştu.';
         
         if (e.toString().contains('Failed host lookup') || 
-            e.toString().contains('Connection refused')) {
-          errorMessage = 'Backend sunucusuna bağlanılamıyor. Lütfen backend\'in çalıştığından emin olun (python app.py)';
-        } else if (e.toString().contains('timeout')) {
-          errorMessage = 'İstek zaman aşımına uğradı. Lütfen tekrar deneyin.';
+            e.toString().contains('Connection refused') ||
+            e.toString().contains('SocketException')) {
+          errorMessage = 'Backend sunucusuna bağlanılamıyor. İnternet bağlantınızı kontrol edin.';
+        } else if (e.toString().contains('timeout') || 
+                   e.toString().contains('TimeoutException')) {
+          errorMessage = '⚠️ Render sunucusu uyku modunda! İlk istek 30-60 saniye sürebilir. Lütfen 10 saniye bekleyip tekrar deneyin.';
+        } else if (e.toString().contains('500') || 
+                   e.toString().contains('502') || 
+                   e.toString().contains('503')) {
+          errorMessage = '⚠️ Backend sunucusu uyku modunda! Lütfen 10 saniye bekleyip tekrar deneyin. İlk istek 30-60 saniye sürebilir.';
         } else {
-          errorMessage = 'Hata: $e';
+          errorMessage = 'Bağlantı hatası: ${e.toString().length > 100 ? e.toString().substring(0, 100) + "..." : e.toString()}';
         }
         
         _messages.add({

@@ -1241,12 +1241,12 @@ class _KararSearchScreenState extends State<KararSearchScreen> {
       // Backend API'den arama yap
       final result = await ApiService.yargitayArama(
         aranacakKelime: hasAramaKelimesi ? _aramaController.text.trim() : '',
-        birim: selectedBirim,
+        birim: selectedBirim ?? '',
         kurul: _selectedKurul ?? '',
         hukukDairesi: _selectedHukukDairesi ?? '',
         cezaDairesi: _selectedCezaDairesi ?? '',
-        esasNo: esasNo,
-        kararNo: kararNo,
+        esasNo: esasNo ?? '',
+        kararNo: kararNo ?? '',
         kararTarihiBaslangic: _kararBaslangicTarihi != null 
             ? DateFormat('dd.MM.yyyy').format(_kararBaslangicTarihi!) 
             : '',
