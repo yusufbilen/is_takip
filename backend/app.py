@@ -694,20 +694,33 @@ LÜTFEN:
         if gemini_api_key:
             try:
                 print('Gemini API çağrısı yapılıyor...')
+                print(f'Gemini API Key var mı: True (Key uzunluğu: {len(gemini_api_key)} karakter)')
                 import google.generativeai as genai
                 genai.configure(api_key=gemini_api_key)
                 
-                model = genai.GenerativeModel('gemini-pro')
+                # Model seç
+                try:
+                    model = genai.GenerativeModel('gemini-1.5-flash')
+                except:
+                    model = genai.GenerativeModel('gemini-pro')
                 
                 prompt = f"""{system_prompt}
 
 {user_prompt}"""
                 
-                response = model.generate_content(prompt)
-                dilekce_metni = response.text
+                response = model.generate_content(
+                    prompt,
+                    generation_config=genai.types.GenerationConfig(
+                        temperature=0.5,
+                        max_output_tokens=2000,
+                    )
+                )
+                dilekce_metni = response.text.strip()
                 print(f'Gemini başarılı! Dilekçe uzunluğu: {len(dilekce_metni)} karakter')
             except Exception as e:
                 print(f'Gemini hatası: {str(e)}')
+                import traceback
+                print(f'Gemini traceback: {traceback.format_exc()}')
                 dilekce_metni = None
         
         # Gemini başarısız olduysa OpenAI'yi dene
@@ -796,14 +809,22 @@ Yanıtların Türkçe olmalı ve profesyonel bir dil kullanmalısın."""
         if gemini_api_key:
             try:
                 print('[AI CHAT] Gemini API çağrısı yapılıyor...')
+                print(f'[AI CHAT] Gemini API Key var mı: True (Key uzunluğu: {len(gemini_api_key)} karakter)')
                 import google.generativeai as genai
                 genai.configure(api_key=gemini_api_key)
                 
-                # Model seç
-                model = genai.GenerativeModel('gemini-pro')
+                # Model seç (gemini-1.5-flash daha hızlı, gemini-pro daha güçlü)
+                try:
+                    model = genai.GenerativeModel('gemini-1.5-flash')
+                except:
+                    model = genai.GenerativeModel('gemini-pro')
                 
-                # Conversation history'yi formatla
-                conversation_text = full_system_prompt + "\n\n"
+                # Conversation history'yi formatla - Gemini için optimize edilmiş format
+                conversation_text = f"""Sistem Talimatları:
+{full_system_prompt}
+
+Konuşma Geçmişi:
+"""
                 
                 # Son 10 mesajı ekle
                 recent_history = conversation_history[-10:] if len(conversation_history) > 10 else conversation_history
@@ -815,14 +836,22 @@ Yanıtların Türkçe olmalı ve profesyonel bir dil kullanmalısın."""
                     else:
                         conversation_text += f"Asistan: {content}\n"
                 
-                conversation_text += f"Kullanıcı: {message}\nAsistan:"
+                conversation_text += f"\nŞimdi kullanıcı soruyor: {message}\n\nLütfen yukarıdaki sistem talimatlarına göre Türk hukuk sistemi konusunda profesyonel bir yanıt ver:"
                 
                 # Gemini API çağrısı
-                response = model.generate_content(conversation_text)
-                ai_response = response.text
+                response = model.generate_content(
+                    conversation_text,
+                    generation_config=genai.types.GenerationConfig(
+                        temperature=0.7,
+                        max_output_tokens=1000,
+                    )
+                )
+                ai_response = response.text.strip()
                 print(f'[AI CHAT] Gemini başarılı! Yanıt uzunluğu: {len(ai_response)} karakter')
             except Exception as e:
                 print(f'[AI CHAT] Gemini hatası: {str(e)}')
+                import traceback
+                print(f'[AI CHAT] Gemini traceback: {traceback.format_exc()}')
                 ai_response = None
         
         # Gemini başarısız olduysa OpenAI'yi dene
@@ -857,7 +886,10 @@ Yanıtların Türkçe olmalı ve profesyonel bir dil kullanmalısın."""
         
         # Her iki API de başarısız olduysa fallback
         if not ai_response:
-            print('[AI CHAT] Tüm API\'ler başarısız, fallback yanıt kullanılıyor')
+            if not gemini_api_key and not openai_api_key:
+                print('[AI CHAT] Hiçbir API key yok, fallback yanıt kullanılıyor')
+            else:
+                print('[AI CHAT] Tüm API\'ler başarısız, fallback yanıt kullanılıyor')
             ai_response = _get_fallback_response(message, asistan_turu)
         
         return jsonify({
