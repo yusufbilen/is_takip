@@ -685,9 +685,12 @@ LÜTFEN:
         
         import os
         # Environment variable'dan oku (Render'da Environment Variables'a eklenmeli)
-        openai_api_key = os.getenv('OPENAI_API_KEY', '')
+        openai_api_key = os.getenv('OPENAI_API_KEY', '').strip()  # Boşlukları temizle
         
         print(f'OpenAI API Key var mı: {bool(openai_api_key)}')
+        if openai_api_key:
+            print(f'Key uzunluğu: {len(openai_api_key)} karakter')
+            print(f'Key başlangıcı: {openai_api_key[:20]}')
         
         if openai_api_key:
             try:
@@ -770,11 +773,18 @@ Yanıtların Türkçe olmalı ve profesyonel bir dil kullanmalısın."""
         
         # Debug: Key'in ilk ve son karakterlerini göster (güvenlik için tam key değil)
         if openai_api_key:
-            key_preview = f"{openai_api_key[:10]}...{openai_api_key[-10:]}" if len(openai_api_key) > 20 else "***"
-            print(f'[AI CHAT] OpenAI API Key var mı: True (Key: {key_preview})')
+            # Key'deki boşlukları temizle
+            openai_api_key = openai_api_key.strip()
+            key_length = len(openai_api_key)
+            key_preview = f"{openai_api_key[:15]}...{openai_api_key[-15:]}" if key_length > 30 else "***"
+            print(f'[AI CHAT] OpenAI API Key var mı: True')
+            print(f'[AI CHAT] Key uzunluğu: {key_length} karakter')
+            print(f'[AI CHAT] Key preview: {key_preview}')
+            print(f'[AI CHAT] Key başlangıcı: {openai_api_key[:20]}')
+            print(f'[AI CHAT] Key sonu: ...{openai_api_key[-20:]}')
         else:
             print('[AI CHAT] OpenAI API Key var mı: False - Render Environment Variables kontrol edilmeli!')
-            print('[AI CHAT] Tüm environment variables:', dict(os.environ))
+            print('[AI CHAT] Tüm environment variables:', {k: v[:20] + '...' if len(v) > 20 else v for k, v in os.environ.items() if 'KEY' in k or 'API' in k})
         
         if openai_api_key:
             # Gerçek OpenAI API çağrısı
