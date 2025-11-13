@@ -7,6 +7,7 @@ import json
 import re
 import os
 from dotenv import load_dotenv
+import xml.etree.ElementTree as ET
 
 # .env dosyasından environment variable'ları yükle
 load_dotenv()
@@ -164,19 +165,20 @@ def get_doviz_kurlari():
         response = requests.get(url, timeout=10)
         
         if response.status_code == 200:
-            soup = BeautifulSoup(response.content, 'xml')
+            # XML parsing için ElementTree kullan (lxml yerine)
+            root = ET.fromstring(response.content)
             kurlar = []
             
-            for currency in soup.find_all('Currency'):
+            for currency in root.findall('.//Currency'):
                 kod = currency.get('CurrencyCode', '')
-                isim = currency.find('Isim')
+                isim_elem = currency.find('Isim')
                 alis = currency.find('ForexBuying')
                 satis = currency.find('ForexSelling')
                 
-                if isim and alis and satis:
+                if isim_elem is not None and alis is not None and satis is not None:
                     kurlar.append({
                         'kod': kod,
-                        'isim': isim.text,
+                        'isim': isim_elem.text if isim_elem.text else '',
                         'alis': float(alis.text) if alis.text else 0,
                         'satis': float(satis.text) if satis.text else 0
                     })
