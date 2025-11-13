@@ -698,11 +698,18 @@ LÜTFEN:
                 import google.generativeai as genai
                 genai.configure(api_key=gemini_api_key)
                 
-                # Model seç
+                # Model seç - Doğru model adları
                 try:
-                    model = genai.GenerativeModel('gemini-1.5-flash')
-                except:
+                    # Önce gemini-pro dene (en yaygın model)
                     model = genai.GenerativeModel('gemini-pro')
+                except Exception as e1:
+                    try:
+                        # Alternatif: gemini-1.5-pro
+                        model = genai.GenerativeModel('gemini-1.5-pro')
+                    except Exception as e2:
+                        # Son çare: gemini-1.0-pro
+                        print(f'Model seçim hatası: {e1}, {e2}')
+                        model = genai.GenerativeModel('gemini-1.0-pro')
                 
                 prompt = f"""{system_prompt}
 
@@ -817,11 +824,18 @@ Yanıtların Türkçe olmalı ve profesyonel bir dil kullanmalısın."""
                 import google.generativeai as genai
                 genai.configure(api_key=gemini_api_key)
                 
-                # Model seç (gemini-1.5-flash daha hızlı, gemini-pro daha güçlü)
+                # Model seç - Doğru model adları
                 try:
-                    model = genai.GenerativeModel('gemini-1.5-flash')
-                except:
+                    # Önce gemini-pro dene (en yaygın model)
                     model = genai.GenerativeModel('gemini-pro')
+                except Exception as e1:
+                    try:
+                        # Alternatif: gemini-1.5-pro
+                        model = genai.GenerativeModel('gemini-1.5-pro')
+                    except Exception as e2:
+                        # Son çare: gemini-1.0-pro
+                        print(f'[AI CHAT] Model seçim hatası: {e1}, {e2}')
+                        model = genai.GenerativeModel('gemini-1.0-pro')
                 
                 # Conversation history'yi formatla - Gemini için optimize edilmiş format
                 conversation_text = f"""Sistem Talimatları:
