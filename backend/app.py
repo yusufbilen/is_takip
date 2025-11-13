@@ -684,15 +684,34 @@ LÜTFEN:
 6. Dilekçe tam ve eksiksiz olsun, sadece şablon değil gerçek bir dilekçe gibi yaz"""
         
         import os
-        # Environment variable'dan oku (Render'da Environment Variables'a eklenmeli)
-        openai_api_key = os.getenv('OPENAI_API_KEY', '').strip()  # Boşlukları temizle
+        # Önce Gemini API'yi dene, yoksa OpenAI'yi dene
+        gemini_api_key = os.getenv('GEMINI_API_KEY', '').strip()
+        openai_api_key = os.getenv('OPENAI_API_KEY', '').strip()
         
-        print(f'OpenAI API Key var mı: {bool(openai_api_key)}')
-        if openai_api_key:
-            print(f'Key uzunluğu: {len(openai_api_key)} karakter')
-            print(f'Key başlangıcı: {openai_api_key[:20]}')
+        dilekce_metni = None
         
-        if openai_api_key:
+        # Gemini API ile dene
+        if gemini_api_key:
+            try:
+                print('Gemini API çağrısı yapılıyor...')
+                import google.generativeai as genai
+                genai.configure(api_key=gemini_api_key)
+                
+                model = genai.GenerativeModel('gemini-pro')
+                
+                prompt = f"""{system_prompt}
+
+{user_prompt}"""
+                
+                response = model.generate_content(prompt)
+                dilekce_metni = response.text
+                print(f'Gemini başarılı! Dilekçe uzunluğu: {len(dilekce_metni)} karakter')
+            except Exception as e:
+                print(f'Gemini hatası: {str(e)}')
+                dilekce_metni = None
+        
+        # Gemini başarısız olduysa OpenAI'yi dene
+        if not dilekce_metni and openai_api_key:
             try:
                 print('OpenAI API çağrısı yapılıyor...')
                 from openai import OpenAI
@@ -767,31 +786,50 @@ Yanıtların Türkçe olmalı ve profesyonel bir dil kullanmalısın."""
     full_system_prompt = f"{system_prompt}\n\n{specific_prompt}"
     
     try:
-        # OpenAI API entegrasyonu
-        # Environment variable'dan oku (Render'da Environment Variables'a eklenmeli)
-        openai_api_key = os.getenv('OPENAI_API_KEY', '')
+        # Önce Gemini API'yi dene, yoksa OpenAI'yi dene
+        gemini_api_key = os.getenv('GEMINI_API_KEY', '').strip()
+        openai_api_key = os.getenv('OPENAI_API_KEY', '').strip()
         
-        # Debug: Key'in ilk ve son karakterlerini göster (güvenlik için tam key değil)
-        if openai_api_key:
-            # Key'deki boşlukları temizle
-            openai_api_key = openai_api_key.strip()
-            key_length = len(openai_api_key)
-            key_preview = f"{openai_api_key[:15]}...{openai_api_key[-15:]}" if key_length > 30 else "***"
-            print(f'[AI CHAT] OpenAI API Key var mı: True')
-            print(f'[AI CHAT] Key uzunluğu: {key_length} karakter')
-            print(f'[AI CHAT] Key preview: {key_preview}')
-            print(f'[AI CHAT] Key başlangıcı: {openai_api_key[:20]}')
-            print(f'[AI CHAT] Key sonu: ...{openai_api_key[-20:]}')
-        else:
-            print('[AI CHAT] OpenAI API Key var mı: False - Render Environment Variables kontrol edilmeli!')
-            print('[AI CHAT] Tüm environment variables:', {k: v[:20] + '...' if len(v) > 20 else v for k, v in os.environ.items() if 'KEY' in k or 'API' in k})
+        ai_response = None
         
-        if openai_api_key:
-            # Gerçek OpenAI API çağrısı
+        # Gemini API ile dene
+        if gemini_api_key:
+            try:
+                print('[AI CHAT] Gemini API çağrısı yapılıyor...')
+                import google.generativeai as genai
+                genai.configure(api_key=gemini_api_key)
+                
+                # Model seç
+                model = genai.GenerativeModel('gemini-pro')
+                
+                # Conversation history'yi formatla
+                conversation_text = full_system_prompt + "\n\n"
+                
+                # Son 10 mesajı ekle
+                recent_history = conversation_history[-10:] if len(conversation_history) > 10 else conversation_history
+                for msg in recent_history:
+                    role = msg.get('role', 'user')
+                    content = msg.get('content', '')
+                    if role == 'user':
+                        conversation_text += f"Kullanıcı: {content}\n"
+                    else:
+                        conversation_text += f"Asistan: {content}\n"
+                
+                conversation_text += f"Kullanıcı: {message}\nAsistan:"
+                
+                # Gemini API çağrısı
+                response = model.generate_content(conversation_text)
+                ai_response = response.text
+                print(f'[AI CHAT] Gemini başarılı! Yanıt uzunluğu: {len(ai_response)} karakter')
+            except Exception as e:
+                print(f'[AI CHAT] Gemini hatası: {str(e)}')
+                ai_response = None
+        
+        # Gemini başarısız olduysa OpenAI'yi dene
+        if not ai_response and openai_api_key:
             try:
                 print('[AI CHAT] OpenAI API çağrısı yapılıyor...')
                 from openai import OpenAI
-                # OpenAI client'ı sadece api_key ile başlat (proxies parametresi yok)
                 client = OpenAI(api_key=openai_api_key)
                 
                 # Conversation history'yi formatla
@@ -799,7 +837,7 @@ Yanıtların Türkçe olmalı ve profesyonel bir dil kullanmalısın."""
                     {"role": "system", "content": full_system_prompt}
                 ]
                 
-                # Son 10 mesajı ekle (token limiti için)
+                # Son 10 mesajı ekle
                 recent_history = conversation_history[-10:] if len(conversation_history) > 10 else conversation_history
                 messages.extend(recent_history)
                 messages.append({"role": "user", "content": message})
@@ -814,13 +852,12 @@ Yanıtların Türkçe olmalı ve profesyonel bir dil kullanmalısın."""
                 ai_response = response.choices[0].message.content
                 print(f'[AI CHAT] OpenAI başarılı! Yanıt uzunluğu: {len(ai_response)} karakter')
             except Exception as e:
-                # OpenAI hatası durumunda fallback
                 print(f'[AI CHAT] OpenAI hatası: {str(e)}')
-                ai_response = _get_fallback_response(message, asistan_turu)
-                print('[AI CHAT] Fallback yanıt kullanıldı (OpenAI hatası)')
-        else:
-            # API key yoksa fallback yanıt
-            print('[AI CHAT] OpenAI API key yok, fallback yanıt kullanılıyor')
+                ai_response = None
+        
+        # Her iki API de başarısız olduysa fallback
+        if not ai_response:
+            print('[AI CHAT] Tüm API\'ler başarısız, fallback yanıt kullanılıyor')
             ai_response = _get_fallback_response(message, asistan_turu)
         
         return jsonify({
