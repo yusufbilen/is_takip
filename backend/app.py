@@ -697,18 +697,39 @@ LÜTFEN:
                 import google.generativeai as genai
                 genai.configure(api_key=gemini_api_key)
                 
-                # Model seç - Doğru model adları
+                # Model seç - Mevcut modelleri listele ve doğru modeli kullan
                 try:
-                    # Önce gemini-pro dene (en yaygın model)
-                    model = genai.GenerativeModel('gemini-pro')
-                except Exception as e1:
-                    try:
-                        # Alternatif: gemini-1.5-pro
+                    # Önce mevcut modelleri listele
+                    available_models = genai.list_models()
+                    model_names = [m.name for m in available_models if 'generateContent' in m.supported_generation_methods]
+                    print(f'Mevcut modeller: {model_names[:5]}')  # İlk 5 modeli göster
+                    
+                    # Önce gemini-1.5-pro dene (en güncel)
+                    if any('gemini-1.5-pro' in name for name in model_names):
                         model = genai.GenerativeModel('gemini-1.5-pro')
-                    except Exception as e2:
-                        # Son çare: gemini-1.0-pro
-                        print(f'Model seçim hatası: {e1}, {e2}')
-                        model = genai.GenerativeModel('gemini-1.0-pro')
+                        print('gemini-1.5-pro kullanılıyor')
+                    elif any('gemini-1.5-flash' in name for name in model_names):
+                        model = genai.GenerativeModel('gemini-1.5-flash')
+                        print('gemini-1.5-flash kullanılıyor')
+                    elif any('gemini-pro' in name for name in model_names):
+                        model = genai.GenerativeModel('gemini-pro')
+                        print('gemini-pro kullanılıyor')
+                    else:
+                        # Varsayılan olarak ilk uygun modeli kullan
+                        first_model = model_names[0] if model_names else 'gemini-pro'
+                        model_name = first_model.split('/')[-1]  # models/gemini-pro -> gemini-pro
+                        model = genai.GenerativeModel(model_name)
+                        print(f'{model_name} kullanılıyor (varsayılan)')
+                except Exception as e:
+                    # Model listesi alınamazsa varsayılan modeli dene
+                    print(f'Model listesi alınamadı: {e}, varsayılan model deneniyor...')
+                    try:
+                        model = genai.GenerativeModel('gemini-1.5-pro')
+                    except:
+                        try:
+                            model = genai.GenerativeModel('gemini-1.5-flash')
+                        except:
+                            model = genai.GenerativeModel('gemini-pro')
                 
                 prompt = f"""{system_prompt}
 
@@ -799,18 +820,39 @@ Yanıtların Türkçe olmalı ve profesyonel bir dil kullanmalısın."""
                 import google.generativeai as genai
                 genai.configure(api_key=gemini_api_key)
                 
-                # Model seç - Doğru model adları
+                # Model seç - Mevcut modelleri listele ve doğru modeli kullan
                 try:
-                    # Önce gemini-pro dene (en yaygın model)
-                    model = genai.GenerativeModel('gemini-pro')
-                except Exception as e1:
-                    try:
-                        # Alternatif: gemini-1.5-pro
+                    # Önce mevcut modelleri listele
+                    available_models = genai.list_models()
+                    model_names = [m.name for m in available_models if 'generateContent' in m.supported_generation_methods]
+                    print(f'[AI CHAT] Mevcut modeller: {model_names[:5]}')  # İlk 5 modeli göster
+                    
+                    # Önce gemini-1.5-pro dene (en güncel)
+                    if any('gemini-1.5-pro' in name for name in model_names):
                         model = genai.GenerativeModel('gemini-1.5-pro')
-                    except Exception as e2:
-                        # Son çare: gemini-1.0-pro
-                        print(f'[AI CHAT] Model seçim hatası: {e1}, {e2}')
-                        model = genai.GenerativeModel('gemini-1.0-pro')
+                        print('[AI CHAT] gemini-1.5-pro kullanılıyor')
+                    elif any('gemini-1.5-flash' in name for name in model_names):
+                        model = genai.GenerativeModel('gemini-1.5-flash')
+                        print('[AI CHAT] gemini-1.5-flash kullanılıyor')
+                    elif any('gemini-pro' in name for name in model_names):
+                        model = genai.GenerativeModel('gemini-pro')
+                        print('[AI CHAT] gemini-pro kullanılıyor')
+                    else:
+                        # Varsayılan olarak ilk uygun modeli kullan
+                        first_model = model_names[0] if model_names else 'gemini-pro'
+                        model_name = first_model.split('/')[-1]  # models/gemini-pro -> gemini-pro
+                        model = genai.GenerativeModel(model_name)
+                        print(f'[AI CHAT] {model_name} kullanılıyor (varsayılan)')
+                except Exception as e:
+                    # Model listesi alınamazsa varsayılan modeli dene
+                    print(f'[AI CHAT] Model listesi alınamadı: {e}, varsayılan model deneniyor...')
+                    try:
+                        model = genai.GenerativeModel('gemini-1.5-pro')
+                    except:
+                        try:
+                            model = genai.GenerativeModel('gemini-1.5-flash')
+                        except:
+                            model = genai.GenerativeModel('gemini-pro')
                 
                 # Conversation history'yi formatla - Gemini için optimize edilmiş format
                 conversation_text = f"""Sistem Talimatları:
