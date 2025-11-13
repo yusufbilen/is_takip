@@ -768,13 +768,20 @@ Yanıtların Türkçe olmalı ve profesyonel bir dil kullanmalısın."""
         # Environment variable'dan oku (Render'da Environment Variables'a eklenmeli)
         openai_api_key = os.getenv('OPENAI_API_KEY', '')
         
-        print(f'[AI CHAT] OpenAI API Key var mı: {bool(openai_api_key)}')
+        # Debug: Key'in ilk ve son karakterlerini göster (güvenlik için tam key değil)
+        if openai_api_key:
+            key_preview = f"{openai_api_key[:10]}...{openai_api_key[-10:]}" if len(openai_api_key) > 20 else "***"
+            print(f'[AI CHAT] OpenAI API Key var mı: True (Key: {key_preview})')
+        else:
+            print('[AI CHAT] OpenAI API Key var mı: False - Render Environment Variables kontrol edilmeli!')
+            print('[AI CHAT] Tüm environment variables:', dict(os.environ))
         
         if openai_api_key:
             # Gerçek OpenAI API çağrısı
             try:
                 print('[AI CHAT] OpenAI API çağrısı yapılıyor...')
                 from openai import OpenAI
+                # OpenAI client'ı sadece api_key ile başlat (proxies parametresi yok)
                 client = OpenAI(api_key=openai_api_key)
                 
                 # Conversation history'yi formatla
@@ -866,7 +873,8 @@ def _get_fallback_response(message, asistan_turu):
     if any(word in message_lower for word in ['merhaba', 'selam', 'hello']):
         return "Merhaba! Ben hukuk asistanınızım. Sadece hukuk, mevzuat, içtihat, dilekçe ve sözleşme konularında size yardımcı olabilirim. Nasıl yardımcı olabilirim?"
     elif any(word in message_lower for word in ['hukuk', 'kanun', 'mevzuat', 'dilekçe', 'sözleşme', 'karar', 'mahkeme', 'dava', 'yargıtay', 'danıştay']):
-        return f"Hukuk konusunda sorunuzu anladım. '{message}' hakkında size yardımcı olabilirim. Daha detaylı yanıtlar için OpenAI API key'i Render dashboard'da Environment Variables'a eklenmelidir. Şimdilik genel bilgiler verebilirim."
+        # Genel hukuk bilgisi ver (API key olmasa bile)
+        return f"Hukuk konusunda sorunuzu anladım. '{message}' hakkında genel bilgiler verebilirim. Daha detaylı yanıtlar için lütfen Render dashboard'da OPENAI_API_KEY environment variable'ını kontrol edin."
     else:
         return "Üzgünüm, ben sadece hukuk, mevzuat, içtihat, dilekçe ve sözleşme konularında yardımcı olabilirim. Lütfen hukuki bir soru sorun."
 
