@@ -684,12 +684,13 @@ LÜTFEN:
 6. Dilekçe tam ve eksiksiz olsun, sadece şablon değil gerçek bir dilekçe gibi yaz"""
         
         import os
-        # Sadece Gemini API kullan
+        # Önce Gemini, sonra OpenAI kullan (fallback)
         gemini_api_key = os.getenv('GEMINI_API_KEY', '').strip()
+        openai_api_key = os.getenv('OPENAI_API_KEY', '').strip()
         
         dilekce_metni = None
         
-        # Gemini API ile dene
+        # Önce Gemini API ile dene
         if gemini_api_key:
             try:
                 print('[DİLEKÇE] Gemini API çağrısı yapılıyor...')
@@ -776,12 +777,44 @@ LÜTFEN:
                 print(f'Gemini traceback: {traceback.format_exc()}')
                 dilekce_metni = None
         
-        # Gemini başarısız olduysa fallback
+        # Gemini başarısız olduysa OpenAI'ye geç
         if not dilekce_metni:
-            if not gemini_api_key:
-                print('Gemini API key yok, fallback dilekçe kullanılıyor')
+            if openai_api_key:
+                try:
+                    print('[DİLEKÇE] OpenAI API çağrısı yapılıyor (Gemini fallback)...')
+                    print(f'[DİLEKÇE] OpenAI API Key var mı: True (Key uzunluğu: {len(openai_api_key)} karakter)')
+                    from openai import OpenAI
+                    client = OpenAI(api_key=openai_api_key)
+                    
+                    # OpenAI için prompt hazırla
+                    openai_prompt = f"""{system_prompt}
+
+{user_prompt}"""
+                    
+                    # OpenAI API çağrısı
+                    response = client.chat.completions.create(
+                        model="gpt-3.5-turbo",
+                        messages=[
+                            {"role": "system", "content": system_prompt},
+                            {"role": "user", "content": user_prompt}
+                        ],
+                        temperature=0.5,
+                        max_tokens=2000
+                    )
+                    dilekce_metni = response.choices[0].message.content.strip()
+                    print(f'[DİLEKÇE] OpenAI başarılı! Dilekçe uzunluğu: {len(dilekce_metni)} karakter')
+                except Exception as e:
+                    print(f'[DİLEKÇE] OpenAI hatası: {str(e)}')
+                    import traceback
+                    print(f'[DİLEKÇE] OpenAI traceback: {traceback.format_exc()}')
+                    dilekce_metni = None
+        
+        # Hem Gemini hem OpenAI başarısız olduysa fallback dilekçe
+        if not dilekce_metni:
+            if not gemini_api_key and not openai_api_key:
+                print('[DİLEKÇE] Hiçbir API key yok, fallback dilekçe kullanılıyor')
             else:
-                print('Gemini API başarısız, fallback dilekçe kullanılıyor')
+                print('[DİLEKÇE] Tüm AI servisleri başarısız, fallback dilekçe kullanılıyor')
             dilekce_metni = _get_fallback_dilekce(dilekce_turu, mahkeme, davaci, davali, konu)
         
         print(f'Dilekçe metni hazırlandı, uzunluk: {len(dilekce_metni)} karakter')
@@ -833,12 +866,13 @@ Yanıtların Türkçe olmalı ve profesyonel bir dil kullanmalısın."""
     full_system_prompt = f"{system_prompt}\n\n{specific_prompt}"
     
     try:
-        # Sadece Gemini API kullan
+        # Önce Gemini, sonra OpenAI kullan (fallback)
         gemini_api_key = os.getenv('GEMINI_API_KEY', '').strip()
+        openai_api_key = os.getenv('OPENAI_API_KEY', '').strip()
         
         ai_response = None
         
-        # Gemini API ile dene
+        # Önce Gemini API ile dene
         if gemini_api_key:
             try:
                 print('[AI CHAT] Gemini API çağrısı yapılıyor...')
@@ -941,12 +975,47 @@ Konuşma Geçmişi:
                 print(f'[AI CHAT] Gemini traceback: {traceback.format_exc()}')
                 ai_response = None
         
-        # Gemini başarısız olduysa fallback
+        # Gemini başarısız olduysa OpenAI'ye geç
         if not ai_response:
-            if not gemini_api_key:
-                print('[AI CHAT] Gemini API key yok, fallback yanıt kullanılıyor')
+            if openai_api_key:
+                try:
+                    print('[AI CHAT] OpenAI API çağrısı yapılıyor (Gemini fallback)...')
+                    print(f'[AI CHAT] OpenAI API Key var mı: True (Key uzunluğu: {len(openai_api_key)} karakter)')
+                    from openai import OpenAI
+                    client = OpenAI(api_key=openai_api_key)
+                    
+                    # Conversation history'yi OpenAI formatına çevir
+                    messages = [{"role": "system", "content": full_system_prompt}]
+                    for msg in conversation_history[-10:]:  # Son 10 mesaj
+                        role = msg.get('role', 'user')
+                        content = msg.get('content', '')
+                        if role == 'user':
+                            messages.append({"role": "user", "content": content})
+                        else:
+                            messages.append({"role": "assistant", "content": content})
+                    messages.append({"role": "user", "content": message})
+                    
+                    # OpenAI API çağrısı
+                    response = client.chat.completions.create(
+                        model="gpt-3.5-turbo",
+                        messages=messages,
+                        temperature=0.7,
+                        max_tokens=1000
+                    )
+                    ai_response = response.choices[0].message.content.strip()
+                    print(f'[AI CHAT] OpenAI başarılı! Yanıt uzunluğu: {len(ai_response)} karakter')
+                except Exception as e:
+                    print(f'[AI CHAT] OpenAI hatası: {str(e)}')
+                    import traceback
+                    print(f'[AI CHAT] OpenAI traceback: {traceback.format_exc()}')
+                    ai_response = None
+        
+        # Hem Gemini hem OpenAI başarısız olduysa fallback yanıt
+        if not ai_response:
+            if not gemini_api_key and not openai_api_key:
+                print('[AI CHAT] Hiçbir API key yok, fallback yanıt kullanılıyor')
             else:
-                print('[AI CHAT] Gemini API başarısız, fallback yanıt kullanılıyor')
+                print('[AI CHAT] Tüm AI servisleri başarısız, fallback yanıt kullanılıyor')
             ai_response = _get_fallback_response(message, asistan_turu)
         
         return jsonify({
