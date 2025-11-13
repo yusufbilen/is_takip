@@ -684,6 +684,7 @@ LÜTFEN:
 6. Dilekçe tam ve eksiksiz olsun, sadece şablon değil gerçek bir dilekçe gibi yaz"""
         
         import os
+        # Environment variable'dan oku (Render'da Environment Variables'a eklenmeli)
         openai_api_key = os.getenv('OPENAI_API_KEY', '')
         
         print(f'OpenAI API Key var mı: {bool(openai_api_key)}')
@@ -764,6 +765,7 @@ Yanıtların Türkçe olmalı ve profesyonel bir dil kullanmalısın."""
     
     try:
         # OpenAI API entegrasyonu
+        # Environment variable'dan oku (Render'da Environment Variables'a eklenmeli)
         openai_api_key = os.getenv('OPENAI_API_KEY', '')
         
         print(f'[AI CHAT] OpenAI API Key var mı: {bool(openai_api_key)}')
