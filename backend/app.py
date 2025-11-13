@@ -766,9 +766,12 @@ Yanıtların Türkçe olmalı ve profesyonel bir dil kullanmalısın."""
         # OpenAI API entegrasyonu
         openai_api_key = os.getenv('OPENAI_API_KEY', '')
         
+        print(f'[AI CHAT] OpenAI API Key var mı: {bool(openai_api_key)}')
+        
         if openai_api_key:
             # Gerçek OpenAI API çağrısı
             try:
+                print('[AI CHAT] OpenAI API çağrısı yapılıyor...')
                 from openai import OpenAI
                 client = OpenAI(api_key=openai_api_key)
                 
@@ -790,11 +793,15 @@ Yanıtların Türkçe olmalı ve profesyonel bir dil kullanmalısın."""
                 )
                 
                 ai_response = response.choices[0].message.content
+                print(f'[AI CHAT] OpenAI başarılı! Yanıt uzunluğu: {len(ai_response)} karakter')
             except Exception as e:
                 # OpenAI hatası durumunda fallback
+                print(f'[AI CHAT] OpenAI hatası: {str(e)}')
                 ai_response = _get_fallback_response(message, asistan_turu)
+                print('[AI CHAT] Fallback yanıt kullanıldı (OpenAI hatası)')
         else:
             # API key yoksa fallback yanıt
+            print('[AI CHAT] OpenAI API key yok, fallback yanıt kullanılıyor')
             ai_response = _get_fallback_response(message, asistan_turu)
         
         return jsonify({
