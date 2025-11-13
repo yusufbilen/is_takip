@@ -2,6 +2,7 @@ services:
   - type: web
     name: dava-takip-backend
     env: python
+    rootDir: backend  # Backend klasörünü root olarak ayarla
     buildCommand: pip install -r requirements.txt
     startCommand: gunicorn app:app
     envVars:
